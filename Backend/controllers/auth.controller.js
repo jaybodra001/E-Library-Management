@@ -2,6 +2,7 @@ import { User } from "../models/user.model.js";
 import { Book } from "../models/book.model.js";
 import bcryptjs from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
+import mongoose from "mongoose";
 
 // User Signup
 export async function signup(req, res) {
@@ -202,9 +203,11 @@ export async function createBook(req, res) {
 // Edit Book
 export async function editBook(req, res) {
   try {
-    const { bookId, title, author, imageUrl, publishDate } = req.body;
+    const { id } = req.params;
+    const { title, author, imageUrl, publishDate } = req.body;
 
-    const book = await Book.findById(bookId);
+    console.log("bookid",id)
+    const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ success: false, message: "Book not found!" });
     }
@@ -226,18 +229,36 @@ export async function editBook(req, res) {
 // Delete Book
 export async function deleteBook(req, res) {
   try {
-    const { bookId } = req.body;
+    const { id } = req.params;
 
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ success: false, message: "Book not found!" });
     }
 
-    await book.remove();
+    await book.deleteOne({ _id: id });
 
     res.status(200).json({ success: true, message: "Book deleted successfully!" });
   } catch (e) {
     console.log("Error in deleteBook controller:" + e.message);
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
+}
+
+
+// Fetch All Books
+export async function getBooks(req, res) {
+  try {
+    // Retrieve all books from the database
+    const books = await Book.find();
+
+    if (!books || books.length === 0) {
+      return res.status(404).json({ success: false, message: "No books found!" });
+    }
+
+    res.status(200).json({ success: true, books });
+  } catch (e) {
+    console.log("Error in getBooks controller:" + e.message);
     res.status(500).json({ success: false, message: "Internal server error!" });
   }
 }
