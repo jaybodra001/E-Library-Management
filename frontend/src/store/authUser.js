@@ -4,15 +4,13 @@ import { create } from "zustand";
 
 export const useAuthStore = create((set) => ({
   user: null,
-  events: [],
   isSigningUp: false,
   isCheckingAuth: true,
   isLoggingOut: false,
   isLoggingIn: false,
-  isCreatingEvent: false,
-  isEditingEvent: false,
-  isDeletingEvent: false,
-  isFetchingEvents: false,  
+  books: [],
+  isFetchingBooks: false, 
+  isBorrowing: false,
 
   signup: async (credentials) => {
     set({ isSigningUp: true });
@@ -61,63 +59,40 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  createEvent: async (eventData) => {
-    set({ isCreatingEvent: true });
+  fetchBooks: async () => {
+    set({ isFetchingBooks: true });
     try {
-      const response = await axios.post("/api/v1/auth/events", eventData);
-      toast.success("Event created successfully!");
-      set({ isCreatingEvent: false });
-      // Optionally, you can update the events list after creation
-      set((state) => ({ events: [...state.events, response.data] }));
+      const response = await axios.get("/api/v1/auth/book");
+      set({ books: response.data.books, isFetchingBooks: false });
+      toast.success("Books fetched successfully");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create event");
-      set({ isCreatingEvent: false });
+      set({ isFetchingBooks: false });
+      toast.error(error.response.data.message || "Failed to fetch books");
     }
   },
-
-  editEvent: async (eventId, updatedEventData) => {
-    set({ isEditingEvent: true });
+ 
+  borrowBook: async (bookId) => {
+    set({ isBorrowing: true });
     try {
-      const response = await axios.put(`/api/v1/auth/events/${eventId}`, updatedEventData);
-      toast.success("Event updated successfully!");
+      const response = await axios.post(
+        "/api/v1/auth/borrow",
+        { bookId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming the token is stored in localStorage
+          },
+        }
+      );
+      toast.success("Book borrowed successfully!");
       set((state) => ({
-        events: state.events.map((event) =>
-          event._id === eventId ? { ...event, ...updatedEventData } : event
+        books: state.books.map((book) =>
+          book._id === bookId ? { ...book, isBorrowed: true } : book
         ),
+        isBorrowing: false,
       }));
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update event");
-    } finally {
-      set({ isEditingEvent: false });
-    }
-  },
-  
-
-  deleteEvent: async (eventId) => {
-    set({ isDeletingEvent: true });
-    try {
-      await axios.delete(`/api/v1/auth/events/${eventId}`);
-      toast.success("Event deleted successfully!");
-      set({ isDeletingEvent: false });
-      // Remove the deleted event from the list
-      set((state) => ({
-        events: state.events.filter((event) => event._id !== eventId),
-      }));
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete event");
-      set({ isDeletingEvent: false });
-    }
-  },
-
-  // New fetchEvents function
-  fetchEvents: async () => {
-    set({ isFetchingEvents: true });
-    try {
-      const response = await axios.get("/api/v1/auth/events");
-      set({ events: response.data, isFetchingEvents: false });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to fetch events");
-      set({ isFetchingEvents: false, events: [] });
+      set({ isBorrowing: false });
+      toast.error(error.response?.data?.message || "Failed to borrow the book");
     }
   },
 }));

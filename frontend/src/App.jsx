@@ -1,6 +1,6 @@
 import "./index.css";
 import Home from "./pages/Home";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";;
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from './store/authUser';
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
@@ -10,34 +10,38 @@ import ReturnBook from "./pages/ReturnBook";
 import ManageBook from "./pages/ManageBook";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import { Loader } from 'lucide-react'
 
 function App() {
-  // const { user, isCheckingAuth, authCheck } = useAuthStore();
-  // console.log('user is here',user)
+  const { user, isCheckingAuth, authCheck } = useAuthStore();
 
-  // useEffect(() => {
-	// 	authCheck();
-	// }, [authCheck]);
+  useEffect(() => {
+    authCheck();
+  }, [authCheck]);
+
+  if (isCheckingAuth) {
+		return (
+			<div className='h-screen'>
+				<div className='flex justify-center items-center bg-black h-full'>
+					<Loader className='animate-spin text-blue-500 size-10' />
+				</div>
+			</div>
+		);
+	}
 
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile/borrow" element={<BorrowBook />} />
-        <Route path="/profile/return" element={<ReturnBook />} />
-        <Route path="/profile/manage-book" element={<ManageBook />} />
-
-        {/* <Route path="/login" element={!user ? <Login /> : <Navigate to ={"/"} />} />
-        <Route path="/register" element={!user ? <Register /> : <Navigate to ={"/"} />} />
-        <Route path="/view" element={user ? <EventView /> : <Navigate to ={"/login"} />} />
-        <Route path="/form"element={user ? <EventForm /> : <Navigate to ={"/login"} />} /> */}
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
+        <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+        <Route path="/profile/borrow" element={user ? <BorrowBook /> : <Navigate to="/login" />} />
+        <Route path="/profile/return" element={user ? <ReturnBook /> : <Navigate to="/login" />} />
+        <Route path="/profile/manage-book" element={user ? <ManageBook /> : <Navigate to="/login" />} />
       </Routes>
       <Toaster />
     </Router>
-    
   );
 }
 
