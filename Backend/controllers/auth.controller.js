@@ -169,7 +169,7 @@ export async function returnBook(req, res) {
     book.isBorrowed = false;
     book.borrowedBy = null;
 
-    user.borrowedBooks = user.borrowedBooks.filter(id => !id.equals(id));
+    user.borrowedBooks = user.borrowedBooks.filter(id => !id.equals(bookId));
 
     await book.save();
     await user.save();

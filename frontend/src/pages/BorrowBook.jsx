@@ -1,58 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import { useAuthStore } from "../store/authUser"; // Import the store
 
 const BorrowBook = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [borrowedBooks, setBorrowedBooks] = useState([
-    {
-      id: 1,
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      title: "1984",
-      author: "George Orwell",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 4,
-      title: "Pride and Prejudice",
-      author: "Jane Austen",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 4,
-        title: "Pride and Prejudice",
-        author: "Jane Austen",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 4,
-        title: "Pride and Prejudice",
-        author: "Jane Austen",
-        image: "https://via.placeholder.com/150",
-      },
-  ]);
+  const { books, fetchBooks, returnBook, user } = useAuthStore(); // Get books, fetchBooks, returnBook, and user from the store
+
+  useEffect(() => {
+    fetchBooks(); // Fetch the books when the component mounts
+  }, [fetchBooks]);
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  const handleReturnBook = async (bookId) => {
+    await returnBook(bookId); // Call the returnBook method from the store
+  };
+
+  // Filter out books that the user has borrowed (isBorrowed: true and borrowedBy matches the user ID)
+  const borrowedBooks = books.filter((book) => book.isBorrowed && book.borrowedBy === user._id);
+
   return (
-    <div
-      className="flex flex-col h-screen"
-      style={{ backgroundColor: "#e1dcc5" }}
-    >
+    <div className="flex flex-col h-screen" style={{ backgroundColor: "#e1dcc5" }}>
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isVisible={isSidebarVisible} />
@@ -64,18 +36,18 @@ const BorrowBook = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {borrowedBooks.map((book) => (
                   <div
-                    key={book.id}
+                    key={book._id}
                     className="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition transform hover:scale-105 flex flex-col items-center"
                   >
                     <img
-                      src={book.image}
+                      src={book.imageUrl || "https://via.placeholder.com/150"}
                       alt={book.title}
                       className="w-36 h-48 object-cover rounded-md mb-4"
                     />
                     <h2 className="text-xl font-bold text-gray-800 mb-2">{book.title}</h2>
                     <p className="text-gray-600 mb-4">by {book.author}</p>
                     <button
-                      onClick={() => alert(`Returning: ${book.title}`)} // Add return logic here
+                      onClick={() => handleReturnBook(book._id)}
                       className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition"
                     >
                       Return

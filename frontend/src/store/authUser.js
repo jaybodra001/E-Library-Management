@@ -148,7 +148,7 @@ export const useAuthStore = create((set) => ({
       toast.success("Book borrowed successfully!");
       set((state) => ({
         books: state.books.map((book) =>
-          book._id === bookId ? { ...book, isBorrowed: true } : book
+          book._id === bookId ? { ...book, isBorrowed: true, borrowedBy: state.user.id } : book
         ),
         isBorrowing: false,
       }));
@@ -173,7 +173,7 @@ export const useAuthStore = create((set) => ({
       toast.success("Book returned successfully!");
       set((state) => ({
         books: state.books.map((book) =>
-          book._id === bookId ? { ...book, isBorrowed: false } : book
+          book._id === bookId ? { ...book, isBorrowed: false, borrowedBy: null } : book
         ),
         isReturning: false,
       }));
@@ -182,5 +182,9 @@ export const useAuthStore = create((set) => ({
       toast.error(error.response?.data?.message || "Failed to return the book");
     }
   },
-  
+
+  // Get books borrowed by the logged-in user
+  getUserBorrowedBooks: () => {
+    return (state) => state.books.filter((book) => book.isBorrowed && book.borrowedBy === state.user.id);
+  },
 }));
