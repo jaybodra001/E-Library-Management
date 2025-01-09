@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import { useAuthStore } from "../store/authUser";
 
 const Profile = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -9,6 +10,7 @@ const Profile = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  const { user } = useAuthStore();
   return (
     <div
       className="flex flex-col h-screen"
@@ -22,12 +24,12 @@ const Profile = () => {
           <div className="w-full bg-white p-6 rounded-lg shadow-md">
             <div className="flex flex-col items-center">
               <img
-                src="https://via.placeholder.com/150"
+                src="https://th.bing.com/th/id/OIP.1yoSL-WO0YU5mQKROudvswHaHa?rs=1&pid=ImgDetMain"
                 alt="Profile"
                 className="w-32 h-32 rounded-full mb-4"
               />
               <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                Welcome, Jay Bodra
+                Welcome, {user.name}
               </h1>
              
             </div>
