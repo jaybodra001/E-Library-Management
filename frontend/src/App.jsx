@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import Profile from "./pages/Profile";
 import BorrowBook from "./pages/BorrowBook";
-import ReturnBook from "./pages/ReturnBook";
 import ManageBook from "./pages/ManageBook";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -37,8 +36,7 @@ function App() {
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
         <Route path="/profile/borrow" element={user ? <BorrowBook /> : <Navigate to="/login" />} />
-        <Route path="/profile/return" element={user ? <ReturnBook /> : <Navigate to="/login" />} />
-        <Route path="/profile/manage-book" element={user ? <ManageBook /> : <Navigate to="/login" />} />
+        <Route path="/profile/manage-book" element={user && user.role === "admin" ? <ManageBook /> : <Navigate to="/login" />} />
       </Routes>
       <Toaster />
     </Router>

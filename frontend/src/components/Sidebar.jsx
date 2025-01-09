@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/authUser";
 
 const Sidebar = ({ isVisible }) => {
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   return (
     <aside
       className={` text-black w-64 p-4 space-y-4 ${
@@ -16,28 +16,29 @@ const Sidebar = ({ isVisible }) => {
       >
         Dashboard
       </NavLink>
-      <NavLink
+      {user.role === "admin" ? (
+        <NavLink
         to="/profile/manage-book"
         className="block p-2 rounded hover:bg-blue-500 hover:text-white transition"
       >
         Manage Books
       </NavLink>
+      ): (
+        <></>
+      )
+    
+    }
+      
       <NavLink
         to="/profile/borrow"
         className="block p-2 rounded hover:bg-blue-500 hover:text-white transition"
       >
         Borrow Books
       </NavLink>
-      <NavLink
-        to="/profile/return"
-        className="block p-2 rounded hover:bg-blue-500 hover:text-white transition"
-      >
-        Return Books
-      </NavLink>
       
       <a
         className="block p-2 rounded cursor-pointer hover:bg-blue-500 hover:text-white transition"
-        onClick={logout}
+        onClick={logout} 
       >
         Logout
       </a>
