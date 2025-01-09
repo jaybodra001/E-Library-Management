@@ -14,8 +14,8 @@ router.post("/book", createBook)
 router.put("/book/:id", protectRoute, editBook)
 router.delete("/book/:id", protectRoute, deleteBook)
 
-router.post("/borrow", protectRoute, borrowBook)
-router.post("/return", protectRoute, returnBook)
+router.post("/book/:id/borrow", protectRoute, borrowBook)
+router.post("/book/:id/return", protectRoute, returnBook)
 
 router.get("/authCheck", protectRoute, authCheck)
 

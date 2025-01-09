@@ -118,10 +118,16 @@ export async function logout(req, res) {
 // Book Borrow
 export async function borrowBook(req, res) {
   try {
-    const { bookId } = req.body;
+    const { id } = req.params;
     const user = req.user;
 
-    const book = await Book.findById(bookId);
+    console.log(id)
+    console.log(user)
+
+    const book = await Book.findById(id);
+
+
+
     if (!book) {
       return res.status(404).json({ success: false, message: "Book not found!" });
     }
@@ -133,7 +139,7 @@ export async function borrowBook(req, res) {
     book.isBorrowed = true;
     book.borrowedBy = user._id;
 
-    user.borrowedBooks.push(bookId);
+    user.borrowedBooks.push(id);
 
     await book.save();
     await user.save();
@@ -148,10 +154,10 @@ export async function borrowBook(req, res) {
 // Book Return
 export async function returnBook(req, res) {
   try {
-    const { bookId } = req.body;
+    const { id } = req.params;
     const user = req.user;
 
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(id);
     if (!book) {
       return res.status(404).json({ success: false, message: "Book not found!" });
     }
@@ -163,7 +169,7 @@ export async function returnBook(req, res) {
     book.isBorrowed = false;
     book.borrowedBy = null;
 
-    user.borrowedBooks = user.borrowedBooks.filter(id => !id.equals(bookId));
+    user.borrowedBooks = user.borrowedBooks.filter(id => !id.equals(id));
 
     await book.save();
     await user.save();
